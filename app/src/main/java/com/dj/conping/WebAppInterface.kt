@@ -110,6 +110,11 @@ internal constructor(internal var mContext: Context, var webView: WebView) {
         mContext.startActivity(browserIntent)
     }
 
+    @JavascriptInterface
+    fun getVersion(eventId: String) {
+        callBack(eventId, BuildConfig.VERSION_NAME)
+    }
+
 
 
 }
