@@ -1,16 +1,15 @@
 package com.dj.conping
 
 import android.app.AlertDialog
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
+import android.content.*
 import android.content.Context.CLIPBOARD_SERVICE
-import android.content.DialogInterface
+import android.net.Uri
 import android.util.Log
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import android.widget.Toast
 import androidx.core.content.ContextCompat.getSystemService
+import androidx.core.content.ContextCompat.startActivity
 import org.json.JSONObject
 
 
@@ -102,6 +101,15 @@ internal constructor(internal var mContext: Context, var webView: WebView) {
         val clip: ClipData = ClipData.newPlainText("simple text", text)
         clipboard.setPrimaryClip(clip);
     }
+
+    @JavascriptInterface
+    fun launchWeb(map: String) {
+        val map: JSONObject = JSONObject(map)
+        val browserIntent = Intent(android.content.Intent.ACTION_VIEW)
+        browserIntent.data = Uri.parse(map.getString("url"))
+        mContext.startActivity(browserIntent)
+    }
+
 
 
 }
