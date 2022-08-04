@@ -1,13 +1,18 @@
 package com.dj.conping
 
 import android.app.AlertDialog
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
+import android.content.Context.CLIPBOARD_SERVICE
 import android.content.DialogInterface
 import android.util.Log
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import android.widget.Toast
+import androidx.core.content.ContextCompat.getSystemService
 import org.json.JSONObject
+
 
 var CALLBACK_FUNCTION = "conpingCallback"
 
@@ -86,11 +91,17 @@ internal constructor(internal var mContext: Context, var webView: WebView) {
         val defaultValue = ""
         val result = sharedPref.getString(key, defaultValue);
         if (result != null) {
-            Log.d("storage-get", result)
-        }
-        if (result != null) {
             callBack(eventId, result)
         };
     }
+
+    @JavascriptInterface
+    fun copyToClipboard(text: String) {
+        Log.d("copyToClipboard", text)
+        val clipboard = mContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clip: ClipData = ClipData.newPlainText("simple text", text)
+        clipboard.setPrimaryClip(clip);
+    }
+
 
 }
