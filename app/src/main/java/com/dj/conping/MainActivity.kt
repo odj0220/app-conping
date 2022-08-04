@@ -2,6 +2,9 @@ package com.dj.conping
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import android.webkit.JsResult
+import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
 
@@ -16,6 +19,24 @@ class MainActivity : AppCompatActivity() {
         webView.settings.setSupportMultipleWindows(true)
 
         webView.webViewClient = WebViewClient()
-        webView.loadUrl("https://gollala-frontend-web-6hnxk7lkqq-du.a.run.app")
+        webView.loadUrl("http://192.168.100.14:3000/apptest")
+
+        webView.addJavascriptInterface(WebAppInterface(this, webView), "ConpingInterface")
+        webView.setWebViewClient(MyWebViewClient())
+        webView.setWebChromeClient(MyWebChromeClient())
+    }
+
+    private inner class MyWebViewClient : WebViewClient() {
+        override fun onPageFinished(view: WebView, url: String) {
+            view.loadUrl("javascript:alert(showVersion('called by Android'))")
+        }
+    }
+
+    private inner class MyWebChromeClient : WebChromeClient() {
+        override fun onJsAlert(view: WebView, url: String, message: String, result: JsResult): Boolean {
+            Log.d("LogTag", message)
+            result.confirm()
+            return super.onJsAlert(view, url, message, result)
+        }
     }
 }
