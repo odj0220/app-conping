@@ -19,7 +19,7 @@ class MainActivity : AppCompatActivity() {
         webView.settings.setSupportMultipleWindows(true)
 
         webView.webViewClient = WebViewClient()
-        webView.loadUrl("http://192.168.100.14:3000/apptest")
+        webView.loadUrl("http://192.168.0.21:3000/apptest")
 
         webView.addJavascriptInterface(WebAppInterface(this, webView), "ConpingInterface")
         webView.setWebViewClient(MyWebViewClient())

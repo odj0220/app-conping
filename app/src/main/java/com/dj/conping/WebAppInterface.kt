@@ -2,14 +2,17 @@ package com.dj.conping
 
 import android.app.AlertDialog
 import android.content.*
-import android.content.Context.CLIPBOARD_SERVICE
 import android.net.Uri
 import android.util.Log
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import android.widget.Toast
-import androidx.core.content.ContextCompat.getSystemService
-import androidx.core.content.ContextCompat.startActivity
+import com.google.firebase.dynamiclinks.ktx.androidParameters
+import com.google.firebase.dynamiclinks.ktx.dynamicLinks
+import com.google.firebase.dynamiclinks.ktx.shortLinkAsync
+import com.google.firebase.dynamiclinks.ktx.component1
+import com.google.firebase.dynamiclinks.ktx.component2
+import com.google.firebase.ktx.Firebase
 import org.json.JSONObject
 
 
@@ -115,6 +118,23 @@ internal constructor(internal var mContext: Context, var webView: WebView) {
         callBack(eventId, BuildConfig.VERSION_NAME)
     }
 
+    @JavascriptInterface
+    fun callShare(map: String, eventId: String) {
+        val map: JSONObject = JSONObject(map)
+
+        val shortLinkTask = Firebase.dynamicLinks.shortLinkAsync {
+            link = Uri.parse("https://conping-yqoln5urha-an.a.run.app")
+            domainUriPrefix = "https://conping.page.link"
+            androidParameters("com.dj.conping") {
+                var type = map.getString("type")
+                var id = map.getString("id")
+            }
+        }.addOnSuccessListener { (shortLink, flowchartLink) ->
+            Log.d("shortLink", shortLink.toString())
+            callBack(eventId, shortLink.toString())
+        }.addOnFailureListener {
+        }
+    }
 
 
 }
