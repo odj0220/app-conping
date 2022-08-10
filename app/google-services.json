@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "102051630000",
+    "project_id": "conping-46f9c",
+    "storage_bucket": "conping-46f9c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:102051630000:android:8d657a0a3128dda10b2475",
+        "android_client_info": {
+          "package_name": "com.dj.conping"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "102051630000-1mb1teeci951fbksrbg12fep46ae7oal.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.dj.conping",
+            "certificate_hash": "a0043d3dc08b292304bd2a8593fc973dfd3e1cf2"
+          }
+        },
+        {
+          "client_id": "102051630000-21lq7b4thc7ft089ms1uh5d16ihc5uk8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCPaiPO8p1Z-kyMbJeyURgzumxPyAa532A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "102051630000-21lq7b4thc7ft089ms1uh5d16ihc5uk8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
