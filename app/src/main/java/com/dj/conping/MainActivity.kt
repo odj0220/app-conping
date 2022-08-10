@@ -1,34 +1,54 @@
 package com.dj.conping
 
-import androidx.appcompat.app.AppCompatActivity
+import android.app.AlertDialog
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.webkit.JsResult
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
+
+    private val backKeyHandler = BackKeyHandler(this);
+    private var webView: WebView? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        webView = initWebview()
+    }
+
+    override fun onBackPressed() {
+        webView?.loadUrl("javascript:onMessageFromApp('onAndroidBackKeyMessage')")
+    }
+
+    private fun initWebview(): WebView {
         val webView: WebView = findViewById(R.id.webview)
         webView.settings.javaScriptEnabled = true
         webView.settings.domStorageEnabled = true
         webView.settings.setSupportMultipleWindows(true)
 
         webView.webViewClient = WebViewClient()
-        webView.loadUrl("http://192.168.0.21:3000/apptest")
+        webView.loadUrl("https://conping-yqoln5urha-an.a.run.app")
 
-        webView.addJavascriptInterface(WebAppInterface(this, webView), "ConpingInterface")
+        webView.addJavascriptInterface(WebAppInterface(this, webView, intent), "ConpingInterface")
         webView.setWebViewClient(MyWebViewClient())
         webView.setWebChromeClient(MyWebChromeClient())
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            WebView.setWebContentsDebuggingEnabled(true);
+        }
+
+        return webView
     }
 
     private inner class MyWebViewClient : WebViewClient() {
         override fun onPageFinished(view: WebView, url: String) {
-            view.loadUrl("javascript:alert(showVersion('called by Android'))")
         }
     }
 
@@ -39,4 +59,9 @@ class MainActivity : AppCompatActivity() {
             return super.onJsAlert(view, url, message, result)
         }
     }
+
+    object GlobalStuff {
+        var exitStat: Boolean = false;
+    }
+
 }

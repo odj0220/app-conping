@@ -1,8 +1,10 @@
 package com.dj.conping
 
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.*
 import android.net.Uri
+import android.os.Handler
 import android.util.Log
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
@@ -14,12 +16,14 @@ import com.google.firebase.dynamiclinks.ktx.component1
 import com.google.firebase.dynamiclinks.ktx.component2
 import com.google.firebase.ktx.Firebase
 import org.json.JSONObject
+import java.net.URLEncoder
 
 
 var CALLBACK_FUNCTION = "conpingCallback"
 
 class WebAppInterface// Instantiate the interface and set the context
-internal constructor(internal var mContext: Context, var webView: WebView) {
+internal constructor(internal var mContext: Activity, var webView: WebView, var intent: Intent) {
+    val backKeyHandler = BackKeyHandler(mContext);
 
     fun callBack(eventId: String, data: Any = "") {
         webView.post(Runnable {
@@ -121,19 +125,54 @@ internal constructor(internal var mContext: Context, var webView: WebView) {
     @JavascriptInterface
     fun callShare(map: String, eventId: String) {
         val map: JSONObject = JSONObject(map)
-
+        var link = URLEncoder.encode("https://conping.page.link?type=" + map.getString("type") + "&id=" + map.getString("id"), "UTF-8")
         val shortLinkTask = Firebase.dynamicLinks.shortLinkAsync {
-            link = Uri.parse("https://conping-yqoln5urha-an.a.run.app")
-            domainUriPrefix = "https://conping.page.link"
-            androidParameters("com.dj.conping") {
-                var type = map.getString("type")
-                var id = map.getString("id")
-            }
+            longLink = Uri.parse("https://conping.page.link/?link=" + link + "&apn=com.dj.conping")
         }.addOnSuccessListener { (shortLink, flowchartLink) ->
-            Log.d("shortLink", shortLink.toString())
-            callBack(eventId, shortLink.toString())
+            val link = shortLink.toString().replace("https://conping.page.link/","https://conping-yqoln5urha-an.a.run.app/share/")
+            Log.d("shortLink", link)
+            callBack(eventId, link)
+            sendIntent(link)
         }.addOnFailureListener {
         }
+    }
+
+    @JavascriptInterface
+    fun onAndroidExit() {
+        backKeyHandler.onBackPressed("\'뒤로\' 버튼을 한번 더 누르시면 종료됩니다", 1)
+    }
+
+
+    @JavascriptInterface
+    fun onInitialized() {
+        Firebase.dynamicLinks
+            .getDynamicLink(intent)
+            .addOnSuccessListener(mContext) { pendingDynamicLinkData ->
+                if (pendingDynamicLinkData != null) {
+                    val url = Uri.parse(pendingDynamicLinkData.link.toString())
+                    Log.d("initFirebaseDeeplink", url.toString())
+                    val type = url.getQueryParameter("type").toString();
+                    val id = url.getQueryParameter("id").toString()
+                    onMessageFromApp(webView, "onDynamicLinkMessage", type, id)
+                }
+            }
+            .addOnFailureListener(mContext) { e -> Log.w("firebase", "getDynamicLink:onFailure", e) }
+    }
+
+    private fun onMessageFromApp(webView: WebView, eventName: String, type: String, id: String) {
+        Log.d("onMessageFromApp2", "javascript:onMessageFromApp('"+eventName+"', {type: '" + type + "', id: '" + id + "'})")
+        webView.loadUrl("javascript:onMessageFromApp('"+eventName+"', {type: '" + type + "', id: '" + id + "'})")
+    }
+
+    private fun sendIntent(text: String) {
+        val sendIntent: Intent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, text)
+            type = "text/plain"
+        }
+
+        val shareIntent = Intent.createChooser(sendIntent, null)
+        mContext.startActivity(shareIntent)
     }
 
 
